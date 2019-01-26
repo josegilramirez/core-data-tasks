@@ -31,7 +31,8 @@ class ViewController: UIViewController {
                     let nameToSave = textField.text
                     else { return }
             
-            self.tasks.append(nameToSave)
+            //self.tasks.append(nameToSave) // Mandamos llamar la función save que guarda el contexto.
+            self.save(name: nameToSave)
             self.tableView.reloadData()
         }
         
@@ -50,8 +51,19 @@ class ViewController: UIViewController {
         let managedContext = appDelegate.persistentContainer.viewContext
         
         // Mandamos llamar la entidad Task que tenemos en el modelo Tasks_Core_Data.xcdatamodelid
-        let entity = NSEntityDescription.entity(forEntityName: "Task", in: managedContext)
+        let entity = NSEntityDescription.entity(forEntityName: "Task", in: managedContext)!
         
+        let task = NSManagedObject(entity: entity, insertInto: managedContext)
+        
+        task.setValue(name, forKeyPath: "name")
+        
+        // Aquí va guardar todo lo que existe en ese momento en el contexto, no solo un task específico
+        do {
+            try managedContext.save()
+            tasks.append(task)
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
     }
     
 }
