@@ -20,6 +20,26 @@ class ViewController: UIViewController {
         title = "The List"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     }
+    
+    // Para cargar los datos guardados
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Para pedir el contexto lo hacemos a través del app delegate
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        // A través del intermediario FetchRequest vamos a acceder a la entidad Task
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Task")
+        
+        do {
+            // Regresa el array de NSManagedObjects de Task
+            tasks = try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
 
     @IBAction func addTaskName(_ sender: UIBarButtonItem) {
         let alert = UIAlertController(title: "New Task", message: "Add a new task", preferredStyle: .alert)
